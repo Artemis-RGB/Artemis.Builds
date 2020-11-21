@@ -34,12 +34,12 @@ namespace Artemis.Build.Controllers
             );
 
             // Get the latest build ID
-            using var latestBuildResponse = await client.GetAsync($"{apiBaseUrl}build/latest/{buildDefinition}?branchName=master&api-version=6.1-preview.1");
+            using var latestBuildResponse = await client.GetAsync($"{apiBaseUrl}build/builds?definitions={buildDefinition}&resultFilter=succeeded&$top=1&api-version=6.1-preview.6");
             latestBuildResponse.EnsureSuccessStatusCode();
             var latestBuildBody = await latestBuildResponse.Content.ReadAsStringAsync();
 
             var latestBuildJson = JObject.Parse(latestBuildBody);
-            var id = latestBuildJson["id"].Value<int>();
+            var id = latestBuildJson["value"][0]["id"].Value<int>();
 
             // Get the artifacts of the latest ID
             using var artifactResponse = await client.GetAsync($"{apiBaseUrl}build/builds/{id}/artifacts?artifactName={artifactName}&api-version=6.1-preview.5");
